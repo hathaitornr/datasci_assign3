@@ -1,5 +1,5 @@
 ######################################################################
-# Code is modified from http://pytorch.org/tutorials/beginner/transfer_learning_tutorial.html
+# Code is closely modified from http://pytorch.org/tutorials/beginner/transfer_learning_tutorial.html
 
 from __future__ import print_function, division
 
@@ -34,7 +34,6 @@ data_transforms = {
     ]),
 }
 
-#data_dir = '/vgg16'
 data_dir = 'tiny-imagenet-5'
 image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x),
                                           data_transforms[x])
@@ -113,8 +112,12 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=50):
                 _, preds = torch.max(outputs.data, 1)
                 loss = criterion(outputs, labels)
 
-                # backward + optimize only if in training phase
+                # backward + optimize 
                 if phase == 'train':
+                    loss.backward()
+                    optimizer.step()
+                    
+                if phase == 'val':
                     loss.backward()
                     optimizer.step()
 
@@ -178,7 +181,6 @@ def visualize_model(model, num_images=6):
 
 model_ft = models.resnet50(pretrained=True)
 num_ftrs = model_ft.fc.in_features
-#num_ftrs = model_ft.classifier[0].out_features
 model_ft.fc = nn.Linear(num_ftrs, 5)
 
 if use_gpu:
