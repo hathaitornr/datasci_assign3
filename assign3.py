@@ -35,7 +35,7 @@ data_transforms = {
 }
 
 #data_dir = '/vgg16'
-data_dir = '../tiny-imagenet-5'
+data_dir = '/tiny-imagenet-5'
 image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x),
                                           data_transforms[x])
                   for x in ['train', 'val']}
