@@ -202,7 +202,7 @@ model_ft = train_model(model_ft, criterion, optimizer_ft, exp_lr_scheduler,
 ######################################################################
 #
 
-visualize_model(model_ft)
+#visualize_model(model_ft)
 torch.save(model_ft.state_dict(), 'model_ft.pt')
 
 
@@ -246,7 +246,7 @@ model_cnn = train_model(model_cnn, criterion, optimizer_conv,
 ######################################################################
 #
 
-visualize_model(model_cnn)
+#visualize_model(model_cnn)
 torch.save(model_cnn.state_dict(), 'model_cnn.pt')
 
 plt.ioff()
