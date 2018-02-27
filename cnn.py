@@ -45,19 +45,6 @@ dataset_sizes = {x: len(image_datasets[x]) for x in ['train', 'val']}
 class_names = image_datasets['train'].classes
 
 use_gpu = torch.cuda.is_available()
-
-# Visualize a few images
-def imshow(inp, title=None):
-    """Imshow for Tensor."""
-    inp = inp.numpy().transpose((1, 2, 0))
-    mean = np.array([0.485, 0.456, 0.406])
-    std = np.array([0.229, 0.224, 0.225])
-    inp = std * inp + mean
-    inp = np.clip(inp, 0, 1)
-    plt.imshow(inp)
-    if title is not None:
-        plt.title(title)
-    plt.pause(0.001)
     
 # Get a batch of training data
 inputs, classes = next(iter(dataloaders['train']))
@@ -143,65 +130,6 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=50):
     model.load_state_dict(best_model_wts)
     return model
 
-# Visualizing the model predictions
-def visualize_model(model, num_images=6):
-    images_so_far = 0
-    fig = plt.figure()
-
-    for i, data in enumerate(dataloaders['val']):
-        inputs, labels = data
-        if use_gpu:
-            inputs, labels = Variable(inputs.cuda()), Variable(labels.cuda())
-        else:
-            inputs, labels = Variable(inputs), Variable(labels)
-
-        outputs = model(inputs)
-        _, preds = torch.max(outputs.data, 1)
-
-        for j in range(inputs.size()[0]):
-            images_so_far += 1
-            ax = plt.subplot(num_images//2, 2, images_so_far)
-            ax.axis('off')
-            ax.set_title('predicted: {}'.format(class_names[preds[j]]))
-            imshow(inputs.cpu().data[j])
-
-            if images_so_far == num_images:
-                return
-            
-######################################################################
-# Finetuning the convnet
-# ----------------------
-#
-# Load a pretrained model and reset final fully connected layer.
-#
-
-model_ft = models.vgg16(pretrained=True)
-num_ftrs = model_ft.classifier[0].out_features
-model_ft.fc = nn.Linear(num_ftrs, 5)
-
-if use_gpu:
-    model_ft = model_ft.cuda()
-
-criterion = nn.CrossEntropyLoss()
-
-# Observe that all parameters are being optimized
-optimizer_ft = optim.SGD(model_ft.parameters(), lr=0.001, momentum=0.9)
-
-# Decay LR by a factor of 0.1 every 7 epochs
-exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=7, gamma=0.1)
-
-######################################################################
-# Train and evaluate
-# ^^^^^^^^^^^^^^^^^^
-
-model_ft = train_model(model_ft, criterion, optimizer_ft, exp_lr_scheduler,
-                       num_epochs=50)
-
-######################################################################
-#
-
-#visualize_model(model_ft)
-torch.save(model_ft.state_dict(), 'model_ft.pt')
 
 
 ######################################################################
@@ -247,6 +175,4 @@ model_cnn = train_model(model_cnn, criterion, optimizer_conv,
 #visualize_model(model_cnn)
 torch.save(model_cnn.state_dict(), 'model_cnn.pt')
 
-plt.ioff()
-plt.show()
 
