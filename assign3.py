@@ -112,12 +112,8 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=50):
                 _, preds = torch.max(outputs.data, 1)
                 loss = criterion(outputs, labels)
 
-                # backward + optimize 
+                # backward + optimize only on training set 
                 if phase == 'train':
-                    loss.backward()
-                    optimizer.step()
-                    
-                if phase == 'val':
                     loss.backward()
                     optimizer.step()
 
@@ -179,8 +175,8 @@ def visualize_model(model, num_images=6):
 # Load a pretrained model and reset final fully connected layer.
 #
 
-model_ft = models.resnet50(pretrained=True)
-num_ftrs = model_ft.fc.in_features
+model_ft = models.vgg16(pretrained=True)
+num_ftrs = model_ft.classifier[0].out_features
 model_ft.fc = nn.Linear(num_ftrs, 5)
 
 if use_gpu:
@@ -217,12 +213,12 @@ torch.save(model_ft.state_dict(), 'model_ft.pt')
 # gradients are not computed in ``backward()``.
 
 
-model_cnn = torchvision.models.resnet50(pretrained=True)
+model_cnn = torchvision.models.vgg16(pretrained=True)
 for param in model_cnn.parameters():
     param.requires_grad = False
 
 # Parameters of newly constructed modules have requires_grad=True by default
-num_ftrs = model_cnn.fc.in_features
+num_ftrs = model_ft.classifier[0].out_features
 model_cnn.fc = nn.Linear(num_ftrs, 5)
 
 if use_gpu:
